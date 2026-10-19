@@ -1,0 +1,30 @@
+nombre = "Ciénega de González"
+slug = "cienega-de-gonzalez"
+activa = true
+pais = "MX"
+idioma = "es"
+zona_horaria = "America/Monterrey"
+
+# Área vigilada (grados decimales)
+oeste = -100.58
+sur = 25.26
+este = -100.16
+norte = 25.46
+
+# Lugares vigilados: se avisa si hay fuego dentro de radio_km
+[[puntos]]
+nombre = "Ciénega de González"
+lat = 25.37876
+lon = -100.23701
+radio_km = 10
+
+[senderos]
+# GeoJSON con LineString o MultiLineString y propiedad "name"
+archivos = ["senderos.geojson"]
+
+[alerta]
+# Nombre de la variable en .env con el chat de Telegram (nunca el valor aquí)
+telegram_chat = "TELEGRAM_CHAT_CIENEGA"
+sendero_fuego_km = 0.4   # tramo con fuego: a 400 m o menos
+sendero_cerca_km = 2.0   # cerca del sendero
+url_mapa = ""            # página de la zona, por ejemplo https://tu-dominio/cienega-de-gonzalez

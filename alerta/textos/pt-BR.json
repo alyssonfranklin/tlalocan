@@ -1,0 +1,26 @@
+{
+  "decimal": ",",
+  "titulo": "🔥 Tlalocan · Fogo detectado por satélite em {zona}",
+  "resumen": "{n} foco(s), {d} detecção(ões).",
+  "foco": "📍 Foco {i}: {lat}, {lon}",
+  "referencia": "{km} km a {dir} de {lugar}",
+  "senderos_en": "Sobre a trilha (≤ {m} m): {lista}",
+  "senderos_cerca": "Perto (≤ {km} km): {lista}",
+  "detalle": "{n} detecção(ões) · {hora} h · FRP máx. {frp} MW",
+  "mapa": "Mapa: {url}",
+  "viento": "Vento agora: {vel} km/h de {dir}, rajadas {raf} km/h, umidade {hr} %.",
+  "viento_hacia": "⚠️ O vento empurra o fogo em direção a {lugar}.",
+  "ver_mapa": "Ver no mapa: {url}",
+  "aviso": "Dado de satélite com 1 a 3 horas de atraso e possíveis falsos positivos. Não substitui avisos oficiais. Emergências: Bombeiros 193, Defesa Civil 199.",
+  "cardinales": [
+    "norte",
+    "nordeste",
+    "leste",
+    "sudeste",
+    "sul",
+    "sudoeste",
+    "oeste",
+    "noroeste"
+  ],
+  "mas": "+{n} foco(s) a mais fora desta lista."
+}

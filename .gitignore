@@ -1,5 +1,5 @@
 .DS_Store
 alerta/.env
-alerta/estado.json
+alerta/estado/
 alerta/logs/
 __pycache__/
