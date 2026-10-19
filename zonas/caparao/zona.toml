@@ -1,0 +1,46 @@
+nombre = "Parque Nacional do Caparaó"
+slug = "caparao"
+activa = true
+pais = "BR"
+idioma = "pt-BR"
+zona_horaria = "America/Sao_Paulo"
+
+# Parque e entorno, incluindo Alto Caparaó, Pedra Menina e Patrimônio da Penha
+oeste = -41.98
+sur = -20.68
+este = -41.64
+norte = -20.23
+
+# Coordenadas do OpenStreetMap (Nominatim). Revise com quem conhece a região.
+[[puntos]]
+nombre = "Alto Caparaó"
+lat = -20.44057
+lon = -41.86838
+radio_km = 8
+
+[[puntos]]
+nombre = "Pedra Menina"
+lat = -20.55339
+lon = -41.8177
+radio_km = 8
+
+[[puntos]]
+nombre = "Patrimônio da Penha"
+lat = -20.58357
+lon = -41.76132
+radio_km = 8
+
+[[puntos]]
+nombre = "Pico da Bandeira"
+lat = -20.43492
+lon = -41.79582
+radio_km = 6
+
+[senderos]
+archivos = ["trilhas.geojson"]
+
+[alerta]
+telegram_chat = "TELEGRAM_CHAT_CAPARAO"
+sendero_fuego_km = 0.4
+sendero_cerca_km = 2.0
+url_mapa = ""
