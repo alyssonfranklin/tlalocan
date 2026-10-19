@@ -1,6 +1,6 @@
 # Tlalocan
 
-Herramienta abierta para vigilar incendios forestales en la sierra de Santiago, Nuevo León, empezando por Ciénega de González.
+Herramienta abierta para vigilar incendios forestales en zonas de montaña. Cada zona es una carpeta con su configuración; hoy vigila Ciénega de González (Nuevo León, México) y el Parque Nacional do Caparaó (Minas Gerais y Espírito Santo, Brasil).
 
 El nombre viene del Tlalocan, el paraíso de Tláloc: un lugar verde y con agua. Es lo que queremos cuidar.
 
@@ -26,15 +26,25 @@ Página que se abre en cualquier navegador, en 2D o 3D, sin instalar nada.
 - Simulación simple de propagación: tocas el mapa, enciendes un fuego y ves cómo lo mueven el viento y la pendiente.
 - Senderos de OpenStreetMap y los tuyos (GPX, KML o GeoJSON), con los tramos que pasan cerca del fuego.
 
+### `zonas/` · Una carpeta por lugar
+
+```
+zonas/
+  cienega-de-gonzalez/   zona.toml, senderos.geojson
+  caparao/               zona.toml, trilhas.geojson
+```
+
+`zona.toml` define el área, el idioma de los avisos (`es` o `pt-BR`), la zona horaria, los lugares vigilados con su radio, los archivos de senderos y el chat de Telegram de la zona.
+
 ### `alerta/` · Aviso por Telegram
 
-Revisa cada 30 minutos las detecciones de FIRMS (VIIRS y MODIS) y avisa cuando hay fuego:
+Un solo proceso revisa cada 30 minutos todas las zonas activas con las detecciones de FIRMS (VIIRS y MODIS). Une las detecciones cercanas en focos y avisa cuando un foco está:
 
-- a menos de 10 km de Ciénega de González (u otro lugar que configures),
+- dentro del radio de un lugar vigilado (por ejemplo, 8 km de Alto Caparaó),
 - sobre un sendero (a 400 m o menos), o
 - cerca de un sendero (a 2 km o menos).
 
-El mensaje incluye los senderos afectados, la detección más cercana con enlace al mapa y el viento actual. Si el viento empuja el fuego hacia el poblado, lo marca.
+Cada foco trae sus coordenadas, la distancia y dirección al lugar más cercano, los senderos afectados, la hora de la última detección y un enlace al mapa. El mensaje cierra con el viento actual y marca si empuja el fuego hacia un lugar vigilado. Los avisos salen en el idioma de la zona.
 
 El dato de satélite llega con 1 a 3 horas de retraso, puede tener falsos positivos y no ve fuegos pequeños o bajo nubes.
 
@@ -45,17 +55,17 @@ Necesitas:
 - Python 3.11 o más reciente (`python3 --version`). No usa librerías externas.
 - Una clave gratuita de FIRMS: https://firms.modaps.eosdis.nasa.gov/api/map_key/
 - Un bot de Telegram: habla con @BotFather, usa `/newbot` y guarda el token.
-- El chat de los avisos: agrega el bot a un grupo, escribe un mensaje y abre `https://api.telegram.org/bot<TOKEN>/getUpdates`. El número en `"chat":{"id": ...}` es el `TELEGRAM_CHAT_ID` (en grupos empieza con `-`).
+- Un chat por zona: agrega el bot al grupo de cada zona, escribe un mensaje y abre `https://api.telegram.org/bot<TOKEN>/getUpdates`. El número en `"chat":{"id": ...}` es el chat (en grupos empieza con `-`). Guárdalo en `.env` con el nombre que indica `telegram_chat` en `zona.toml`.
 
 ```zsh
 cd ~/projects/tlalocan/alerta
 cp .env.example .env
-open -e .env    # llena las tres claves y guarda
+open -e .env    # llena las claves y guarda
 
 # Prueba con datos reales del 25 de marzo de 2021 (no envía nada)
-python3 alerta.py --archivo ejemplo-2021-03-25.csv --prueba
+python3 alerta.py --zona cienega-de-gonzalez --archivo ../zonas/cienega-de-gonzalez/ejemplo-2021-03-25.csv --prueba
 
-# Prueba contra FIRMS de hoy (no envía nada)
+# Prueba contra FIRMS de hoy, todas las zonas (no envía nada)
 python3 alerta.py --prueba
 
 # Programar cada 30 minutos
@@ -72,15 +82,22 @@ Para detenerla:
 launchctl bootout gui/$(id -u)/mx.tlalocan.alerta
 ```
 
-Cada detección avisada se guarda en `estado.json` por 5 días, así no se repite. Cada vuelta manda como máximo un mensaje.
+Cada detección avisada se guarda en `alerta/estado/<zona>.json` por 5 días, así no se repite. Cada vuelta manda como máximo un mensaje por zona. Si una zona falla, las demás siguen.
 
-## Usarlo en otra zona
+## Agregar una zona
 
-Edita `alerta/config.toml`: área, lugares a vigilar y radios. Para senderos sirve cualquier GeoJSON con líneas y la propiedad `name`; agrégalo en `[senderos] archivos`.
+1. Copia una carpeta de `zonas/` con un nombre nuevo en minúsculas y con guiones (será la URL: `/nueva-zona`).
+2. Edita `zona.toml`: nombre, área, idioma, zona horaria, lugares y radios.
+3. Agrega los senderos en GeoJSON (líneas con la propiedad `name`). Los de OpenStreetMap se pueden exportar desde overpass turbo.
+4. Agrega el chat de la zona en `alerta/.env` y prueba con `python3 alerta.py --zona nueva-zona --prueba`.
+
+Para otro idioma, copia `alerta/textos/es.json` y tradúcelo.
 
 ## Próximos pasos
 
-- Job en la Mac Mini que actualice el mapa con datos del día (FIRMS, Open-Meteo, Sentinel-2) en vez de datos fijos de 2021.
+- Proceso que genere los datos del mapa de cada zona (relieve, senderos, FIRMS, Open-Meteo, Sentinel-2) y una página por zona en `/<zona>`; el incendio de 2021 pasa a ser un evento en `/cienega-de-gonzalez/marzo-2021`.
+- Para Brasil, sumar las detecciones del INPE (BDQueimadas) a las de FIRMS.
+- Vegetación real (ESA WorldCover o MapBiomas) en la simulación, en vez de suponerla por altitud.
 - Viento medido por estaciones locales (SMN/CONAGUA); el reanálisis ERA5 no captó el viento del oeste que empujó el fuego en 2021.
 - Más senderos, con permiso de Wikiloc o mejorando OpenStreetMap.
 
@@ -92,4 +109,4 @@ El código está bajo licencia MIT (ver `LICENSE`). Los datos tienen sus propias
 - Imágenes: contiene datos modificados de Copernicus Sentinel (2021), vía Earth Search (AWS).
 - Relieve: Copernicus DEM GLO-90.
 - Clima: Open-Meteo (CC BY 4.0) y reanálisis ERA5; uso no comercial sin clave.
-- Senderos (`alerta/senderos.geojson` y los del mapa): © colaboradores de OpenStreetMap, licencia ODbL. Si mejoras esos datos, la versión derivada debe seguir abierta bajo ODbL.
+- Senderos (`zonas/*/senderos.geojson`, `zonas/*/trilhas.geojson` y los del mapa): © colaboradores de OpenStreetMap, licencia ODbL. Si mejoras esos datos, la versión derivada debe seguir abierta bajo ODbL.
